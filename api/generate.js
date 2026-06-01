@@ -28,8 +28,8 @@ Respond ONLY with a valid JSON object, no markdown, no backticks, with EXACTLY t
  "cover": 2-3 very short words for a cover image, separated by " / "
 }`;
 
-    // Birden fazla model dene — biri yanıt vermezse diğerine geç (model kaynaklı hatayı önler)
-    const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-flash-latest"];
+    // Bu hesapta MEVCUT olduğu doğrulanmış modeller (models listesinden)
+    const models = ["gemini-2.5-flash", "gemini-flash-latest", "gemini-2.0-flash"];
     let lastErr = null;
 
     for (const model of models) {
@@ -49,7 +49,6 @@ Respond ONLY with a valid JSON object, no markdown, no backticks, with EXACTLY t
       const data = await r.json();
 
       if (!r.ok) {
-        // Hatayı sakla, sonraki modeli dene
         lastErr = data?.error?.message || JSON.stringify(data);
         continue;
       }
@@ -63,12 +62,11 @@ Respond ONLY with a valid JSON object, no markdown, no backticks, with EXACTLY t
         res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate");
         return res.status(200).json(parsed);
       } catch {
-        lastErr = "Yanıt JSON olarak çözümlenemedi.";
+        lastErr = "Yanıt JSON olarak çözümlenemedi: " + txt.slice(0, 200);
         continue;
       }
     }
 
-    // Hiçbir model çalışmadıysa gerçek sebebi döndür
     return res.status(502).json({ error: "Üretim başarısız", detail: lastErr });
   } catch (e) {
     return res.status(500).json({ error: "Sunucu hatası", detail: String(e) });
