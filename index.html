@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dijital Ürün Roketi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --teal:#005b52;--green:#9fc031;--dark:#13222b;
+    --cream:#f7f5ef;--ivory:#fffdf8;--teal-soft:#e3efed;--line:#e6e2d8;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{
+    font-family:'Poppins',sans-serif;
+    background:
+      radial-gradient(circle at 18% 8%, rgba(159,192,49,.12), transparent 45%),
+      radial-gradient(circle at 85% 92%, rgba(0,91,82,.20), transparent 50%),
+      var(--dark);
+    min-height:100vh;display:flex;align-items:center;justify-content:center;
+    padding:24px 12px;color:var(--dark);
+  }
+  .phone{
+    width:390px;max-width:100%;height:820px;background:var(--ivory);
+    border-radius:46px;border:11px solid #0a1419;
+    box-shadow:0 40px 90px -20px rgba(0,0,0,.6),0 0 0 2px rgba(159,192,49,.15);
+    position:relative;overflow:hidden;display:flex;flex-direction:column;
+  }
+  .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);
+    width:140px;height:26px;background:#0a1419;border-radius:0 0 18px 18px;z-index:50;}
+  .statusbar{flex:0 0 auto;height:46px;display:flex;align-items:center;justify-content:space-between;
+    padding:6px 26px 0;font-size:13px;font-weight:600;}
+  .statusbar .right{display:flex;gap:6px;align-items:center;font-size:12px;}
+
+  .screen{flex:1;overflow-y:auto;overflow-x:hidden;position:relative;}
+  .screen::-webkit-scrollbar{display:none;}
+  .view{display:none;flex-direction:column;min-height:100%;animation:fade .45s ease;}
+  .view.active{display:flex;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  .pad{padding:20px 24px 26px;}
+
+  .brand-row{display:flex;align-items:center;gap:10px;}
+  .logo-dot{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--teal),var(--green));
+    display:flex;align-items:center;justify-content:center;font-size:18px;}
+  .brand-name{font-family:'Lora',serif;font-weight:600;font-size:16px;color:var(--teal);}
+  .brand-sub{font-size:10px;color:#8a8676;letter-spacing:.5px;text-transform:uppercase;}
+
+  .langbar{margin-left:auto;display:flex;gap:4px;background:var(--cream);padding:4px;border-radius:12px;}
+  .langbar button{border:none;background:transparent;font-family:'Poppins';font-size:11px;font-weight:600;
+    color:#8a8676;padding:5px 9px;border-radius:8px;cursor:pointer;transition:.2s;}
+  .langbar button.on{background:var(--teal);color:#fff;}
+
+  h1{font-family:'Lora',serif;font-weight:600;font-size:26px;line-height:1.25;color:var(--dark);margin:24px 0 10px;}
+  h1 .accent{color:var(--teal);}
+  .lede{font-size:13.5px;color:#6c6857;line-height:1.6;margin-bottom:22px;}
+  .step-label{font-size:11px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:var(--green);margin-bottom:13px;}
+
+  .niche{background:var(--ivory);border:1.5px solid var(--line);border-radius:18px;
+    padding:15px 17px;margin-bottom:11px;display:flex;align-items:center;gap:13px;cursor:pointer;transition:.22s;}
+  .niche:active{transform:scale(.98);}
+  .niche.sel{border-color:var(--teal);background:var(--teal-soft);box-shadow:0 8px 20px -10px rgba(0,91,82,.4);}
+  .niche .emoji{font-size:22px;width:44px;height:44px;border-radius:13px;background:var(--cream);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .niche.sel .emoji{background:#fff;}
+  .niche .txt b{display:block;font-size:14px;font-weight:600;color:var(--dark);}
+  .niche .txt span{font-size:11.5px;color:#8a8676;}
+  .niche .check{margin-left:auto;width:21px;height:21px;border-radius:50%;border:2px solid var(--line);
+    flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;transition:.2s;}
+  .niche.sel .check{background:var(--teal);border-color:var(--teal);}
+
+  .lang-out{margin-top:4px;}
+  .lang-out .step-label{margin-bottom:10px;}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;}
+  .chip{border:1.5px solid var(--line);background:var(--ivory);border-radius:13px;padding:9px 14px;
+    font-size:13px;font-weight:500;cursor:pointer;transition:.2s;}
+  .chip:active{transform:scale(.96);}
+  .chip.sel{border-color:var(--green);background:rgba(159,192,49,.14);color:var(--teal);font-weight:600;}
+
+  .btn{background:var(--teal);color:#fff;border:none;border-radius:15px;width:100%;
+    padding:16px;font-family:'Poppins';font-size:15px;font-weight:600;cursor:pointer;margin-top:18px;
+    transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px;
+    box-shadow:0 12px 26px -12px rgba(0,91,82,.7);}
+  .btn:active{transform:translateY(2px);}
+  .btn.green{background:var(--green);color:var(--dark);box-shadow:0 12px 26px -12px rgba(159,192,49,.8);}
+  .btn.ghost{background:transparent;color:var(--teal);border:1.5px solid var(--line);box-shadow:none;margin-top:10px;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+
+  .load-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 36px;}
+  .rocket{font-size:48px;animation:float 1.6s ease-in-out infinite;}
+  @keyframes float{0%,100%{transform:translateY(0) rotate(-8deg);}50%{transform:translateY(-14px) rotate(2deg);}}
+  .load-title{font-family:'Lora',serif;font-size:19px;font-weight:600;color:var(--teal);margin:22px 0 8px;}
+  .load-step{font-size:12.5px;color:#8a8676;min-height:38px;transition:.3s;line-height:1.5;}
+  .bar{width:100%;height:6px;background:var(--cream);border-radius:6px;margin-top:22px;overflow:hidden;}
+  .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--green));border-radius:6px;transition:width .4s ease;}
+  .live-pill{margin-top:18px;font-size:11px;color:var(--green);font-weight:600;letter-spacing:.5px;}
+
+  .result-head{background:linear-gradient(135deg,var(--teal),var(--dark));color:#fff;padding:24px 24px 20px;}
+  .result-head .pill{display:inline-block;background:rgba(159,192,49,.22);color:var(--green);font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;}
+  .result-head .tag{font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;opacity:.7;margin-top:13px;}
+  .result-head h2{font-family:'Lora',serif;font-size:20px;font-weight:600;margin-top:5px;}
+  .result-head .meta{font-size:11.5px;opacity:.8;margin-top:7px;}
+
+  .card{background:var(--ivory);border:1.5px solid var(--line);border-radius:18px;padding:17px;margin:14px 24px 0;}
+  .card-label{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--green);margin-bottom:11px;}
+  .card-label .ic{color:var(--teal);}
+  .card h3{font-size:14.5px;font-weight:600;color:var(--dark);line-height:1.45;}
+  .card p{font-size:13px;color:#5c584a;line-height:1.65;}
+  .tags{display:flex;flex-wrap:wrap;gap:7px;}
+  .tags span{background:var(--teal-soft);color:var(--teal);font-size:11.5px;font-weight:500;padding:6px 11px;border-radius:20px;}
+
+  .polaroid{background:#fff;padding:10px 10px 16px;border-radius:6px;box-shadow:0 10px 24px -12px rgba(0,0,0,.3);
+    margin:0 auto;width:190px;transform:rotate(-2deg);}
+  .polaroid .img{height:190px;border-radius:3px;background:
+      radial-gradient(circle at 30% 30%, var(--green), transparent 60%),
+      linear-gradient(150deg,var(--teal),var(--dark));
+      display:flex;align-items:center;justify-content:center;color:#fff;text-align:center;padding:18px;font-family:'Lora',serif;}
+  .polaroid .img span{font-size:15px;font-weight:600;line-height:1.3;}
+  .polaroid .cap{text-align:center;font-size:10.5px;color:#8a8676;margin-top:8px;font-family:'Poppins';}
+
+  .copy-note{font-size:11px;color:#a8a494;text-align:center;margin:16px 24px 4px;}
+  .footer-cta{padding:6px 24px 24px;}
+
+  .market-head{padding:24px 24px 6px;}
+  .market-head .pill{display:inline-block;background:rgba(0,91,82,.12);color:var(--teal);font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;}
+  .market-head h2{font-family:'Lora',serif;font-size:24px;font-weight:600;color:var(--dark);margin:16px 0 6px;line-height:1.25;}
+  .market-head h2 .accent{color:var(--teal);}
+  .stats{display:flex;gap:11px;padding:14px 24px 0;}
+  .stat{flex:1;background:var(--dark);color:#fff;border-radius:18px;padding:16px 14px;text-align:center;}
+  .stat.alt{background:linear-gradient(135deg,var(--teal),var(--dark));}
+  .stat .num{font-family:'Lora',serif;font-size:26px;font-weight:600;color:var(--green);}
+  .stat .lbl{font-size:10.5px;opacity:.85;margin-top:4px;line-height:1.3;}
+
+  .model{margin:16px 24px 0;background:var(--ivory);border:1.5px solid var(--line);border-radius:18px;overflow:hidden;}
+  .model .row{display:flex;justify-content:space-between;align-items:center;padding:14px 17px;border-bottom:1px solid var(--line);}
+  .model .row:last-child{border-bottom:none;}
+  .model .row b{font-size:13.5px;color:var(--dark);}
+  .model .row span{font-size:12px;color:#8a8676;}
+  .model .row .price{font-family:'Lora',serif;font-weight:600;color:var(--teal);font-size:15px;}
+  .model .row.hl{background:var(--teal-soft);}
+
+  .why{margin:16px 24px 0;}
+  .why .item{display:flex;gap:11px;align-items:flex-start;margin-bottom:13px;}
+  .why .item .ic{width:30px;height:30px;border-radius:9px;background:var(--teal-soft);color:var(--teal);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px;}
+  .why .item p{font-size:12.5px;color:#5c584a;line-height:1.55;}
+  .why .item p b{color:var(--dark);}
+
+  .dots{display:flex;gap:6px;justify-content:center;padding:14px 0 4px;}
+  .dots i{width:7px;height:7px;border-radius:50%;background:var(--line);transition:.3s;}
+  .dots i.on{background:var(--teal);width:20px;border-radius:7px;}
+
+  .err{margin:14px 24px;padding:13px 15px;background:#fdeceb;border:1px solid #f5c6c2;border-radius:14px;
+    font-size:12.5px;color:#b3261e;line-height:1.5;}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="notch"></div>
+  <div class="statusbar">
+    <span>22:22</span>
+    <span class="right">····  📶  <b style="color:var(--teal)">19%</b></span>
+  </div>
+
+  <div class="screen">
+
+    <div class="view active" id="v1">
+      <div class="pad">
+        <div class="brand-row">
+          <div class="logo-dot">🚀</div>
+          <div>
+            <div class="brand-name">Dijital Ürün Roketi</div>
+            <div class="brand-sub">Integra Akademi</div>
+          </div>
+          <div class="langbar" id="langbar">
+            <button data-l="tr" class="on" onclick="setLang('tr')">TR</button>
+            <button data-l="en" onclick="setLang('en')">EN</button>
+            <button data-l="de" onclick="setLang('de')">DE</button>
+            <button data-l="fr" onclick="setLang('fr')">FR</button>
+          </div>
+        </div>
+
+        <h1 id="h1"></h1>
+        <p class="lede" id="lede"></p>
+
+        <div class="step-label" id="lab1"></div>
+        <div id="niches"></div>
+
+        <div class="lang-out">
+          <div class="step-label" id="lab2"></div>
+          <div class="chips" id="outlangs"></div>
+        </div>
+
+        <button class="btn" id="goBtn" disabled onclick="go()"><span id="goTxt"></span> →</button>
+      </div>
+      <div class="dots"><i class="on"></i><i></i><i></i><i></i></div>
+    </div>
+
+    <div class="view" id="v2">
+      <div class="load-wrap">
+        <div class="rocket">🚀</div>
+        <div class="load-title" id="loadTitle"></div>
+        <div class="load-step" id="loadStep"></div>
+        <div class="bar"><i id="barFill"></i></div>
+        <div class="live-pill">⚡ Gemini AI · canlı üretim</div>
+      </div>
+      <div class="dots"><i></i><i class="on"></i><i></i><i></i></div>
+    </div>
+
+    <div class="view" id="v3">
+      <div class="result-head">
+        <span class="pill" id="resPill"></span>
+        <div class="tag" id="resTag"></div>
+        <h2 id="resTitle"></h2>
+        <div class="meta" id="resMeta"></div>
+      </div>
+      <div id="resBody"></div>
+      <div class="copy-note" id="resNote"></div>
+      <div class="footer-cta">
+        <button class="btn green" onclick="show('v4');renderMarket();"><span id="seeMarket"></span></button>
+        <button class="btn ghost" onclick="reset()"><span id="again"></span></button>
+      </div>
+      <div class="dots"><i></i><i></i><i class="on"></i><i></i></div>
+    </div>
+
+    <div class="view" id="v4">
+      <div class="market-head">
+        <span class="pill" id="mPill"></span>
+        <h2 id="mTitle"></h2>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="num">9M+</div><div class="lbl" id="s1"></div></div>
+        <div class="stat alt"><div class="num">$2B+</div><div class="lbl" id="s2"></div></div>
+        <div class="stat"><div class="num">5</div><div class="lbl" id="s3"></div></div>
+      </div>
+      <div class="model">
+        <div class="row"><div><b id="p1n"></b><br><span id="p1d"></span></div><div class="price" id="p1p"></div></div>
+        <div class="row hl"><div><b id="p2n"></b><br><span id="p2d"></span></div><div class="price">$19/ay</div></div>
+        <div class="row"><div><b id="p3n"></b><br><span id="p3d"></span></div><div class="price">$49/ay</div></div>
+      </div>
+      <div class="why">
+        <div class="item"><div class="ic">🌍</div><p id="w1"></p></div>
+        <div class="item"><div class="ic">⏱️</div><p id="w2"></p></div>
+        <div class="item"><div class="ic">🧠</div><p id="w3"></p></div>
+        <div class="item"><div class="ic">📈</div><p id="w4"></p></div>
+      </div>
+      <div class="footer-cta" style="padding-top:18px;">
+        <button class="btn" onclick="reset()"><span id="restart"></span></button>
+      </div>
+      <div class="dots"><i></i><i></i><i></i><i class="on"></i></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const T = {
+  tr:{h1a:'Bir niş seç,',h1b:'gerisini yapay zeka üretsin.',
+    lede:'Etsy için satışa hazır dijital ürün paketini saniyeler içinde üret: başlık, açıklama, SEO etiketleri ve kapak konsepti — seçtiğin dilde.',
+    lab1:'Adım 1 · Niş seçimi',lab2:'Adım 2 · Üretim dili',go:'Paketi üret',
+    loadTitle:'Yapay zeka üretiyor…',pill:'✦ Paket hazır',tag:'ÜRETİLEN ÜRÜN',
+    note:'🔒 Tüm içerik dışa aktarmaya hazır — PDF + PNG',seeMarket:'Neden büyük bir fırsat? →',again:'↺ Yeni paket üret',
+    title:'Etsy SEO Başlığı',desc:'Ürün Açıklaması',tags:'SEO Etiketleri',cover:'Kapak Konsepti',
+    metaWord:"sn'de üretildi",restart:'↺ Demoyu baştan dene',coverCap:'Lora serif · krem zemin · polaroid çerçeve',
+    s1:'aktif Etsy satıcısı',s2:'dijital ürün pazarı',s3:'dilde üretim',mPill:'PAZAR & İŞ MODELİ',
+    mTitleA:'Her Etsy satıcısı,',mTitleB:'bir günde mağaza kurabilir.',
+    p1n:'Başlangıç',p1d:'5 ürün / ay',p1p:'Ücretsiz',p2n:'Üretici',p2d:'Sınırsız ürün + çok dil',p3n:'Stüdyo',p3d:'Toplu üretim + ekip',
+    w1:'<b>Global pazar:</b> Tek arayüz, 5 dilde satışa hazır içerik. Türk satıcı Almanya\'ya, ABD\'ye satar.',
+    w2:'<b>Saatler → saniyeler:</b> Bir ürün listelemesi normalde 1-2 saat. Bizimle dakikadan az.',
+    w3:'<b>Uzman temelli:</b> İçerik şablonları psikolog yaklaşımıyla kurgulandı — sıradan AI çıktısı değil.',
+    w4:'<b>Hazır ekosistem:</b> Arkasında 100 kişilik içerik ekibi ve büyük marka iş birlikleri olan bir yapı.'},
+  en:{h1a:'Pick a niche,',h1b:'let AI build the rest.',
+    lede:'Generate a ready-to-sell Etsy digital product package in seconds: title, description, SEO tags and cover concept — in your chosen language.',
+    lab1:'Step 1 · Pick a niche',lab2:'Step 2 · Output language',go:'Generate package',
+    loadTitle:'AI is generating…',pill:'✦ Package ready',tag:'GENERATED PRODUCT',
+    note:'🔒 All content export-ready — PDF + PNG',seeMarket:'Why is this a big opportunity? →',again:'↺ Generate new package',
+    title:'Etsy SEO Title',desc:'Product Description',tags:'SEO Tags',cover:'Cover Concept',
+    metaWord:'s to generate',restart:'↺ Restart demo',coverCap:'Lora serif · cream bg · polaroid frame',
+    s1:'active Etsy sellers',s2:'digital product market',s3:'output languages',mPill:'MARKET & BUSINESS MODEL',
+    mTitleA:'Every Etsy seller can',mTitleB:'launch a shop in a day.',
+    p1n:'Starter',p1d:'5 products / mo',p1p:'Free',p2n:'Creator',p2d:'Unlimited + multilingual',p3n:'Studio',p3d:'Bulk + team',
+    w1:'<b>Global market:</b> One interface, content ready to sell in 5 languages. A Turkish seller sells to Germany and the US.',
+    w2:'<b>Hours → seconds:</b> A listing normally takes 1-2 hours. With us, under a minute.',
+    w3:'<b>Expert-built:</b> Templates designed with a psychologist\'s approach — not generic AI output.',
+    w4:'<b>Ready ecosystem:</b> Backed by a 100-person content team and major brand collaborations.'},
+  de:{h1a:'Wähle eine Nische,',h1b:'die KI macht den Rest.',
+    lede:'Erstelle in Sekunden ein verkaufsfertiges digitales Etsy-Produktpaket: Titel, Beschreibung, SEO-Tags und Cover-Konzept — in deiner Sprache.',
+    lab1:'Schritt 1 · Nische wählen',lab2:'Schritt 2 · Ausgabesprache',go:'Paket erstellen',
+    loadTitle:'KI generiert…',pill:'✦ Paket fertig',tag:'GENERIERTES PRODUKT',
+    note:'🔒 Alle Inhalte exportbereit — PDF + PNG',seeMarket:'Warum eine große Chance? →',again:'↺ Neues Paket',
+    title:'Etsy SEO-Titel',desc:'Produktbeschreibung',tags:'SEO-Tags',cover:'Cover-Konzept',
+    metaWord:'s generiert',restart:'↺ Demo neu starten',coverCap:'Lora serif · cremefarben · Polaroid',
+    s1:'aktive Etsy-Verkäufer',s2:'Markt für Digitalprodukte',s3:'Ausgabesprachen',mPill:'MARKT & GESCHÄFTSMODELL',
+    mTitleA:'Jeder Etsy-Verkäufer kann',mTitleB:'an einem Tag einen Shop starten.',
+    p1n:'Starter',p1d:'5 Produkte / Monat',p1p:'Kostenlos',p2n:'Creator',p2d:'Unbegrenzt + mehrsprachig',p3n:'Studio',p3d:'Massen + Team',
+    w1:'<b>Globaler Markt:</b> Eine Oberfläche, Inhalte verkaufsfertig in 5 Sprachen.',
+    w2:'<b>Stunden → Sekunden:</b> Ein Listing dauert normal 1-2 Stunden. Bei uns unter einer Minute.',
+    w3:'<b>Von Experten:</b> Vorlagen mit dem Ansatz einer Psychologin — keine generische KI-Ausgabe.',
+    w4:'<b>Fertiges Ökosystem:</b> Gestützt auf ein 100-köpfiges Content-Team und große Markenkooperationen.'},
+  fr:{h1a:'Choisis une niche,',h1b:"l'IA crée le reste.",
+    lede:"Générez en quelques secondes un pack de produit numérique Etsy prêt à vendre : titre, description, tags SEO et concept de couverture — dans votre langue.",
+    lab1:'Étape 1 · Choisir une niche',lab2:'Étape 2 · Langue de sortie',go:'Générer le pack',
+    loadTitle:"L'IA génère…",pill:'✦ Pack prêt',tag:'PRODUIT GÉNÉRÉ',
+    note:'🔒 Contenu prêt à exporter — PDF + PNG',seeMarket:'Pourquoi une grande opportunité ? →',again:'↺ Nouveau pack',
+    title:'Titre SEO Etsy',desc:'Description du produit',tags:'Tags SEO',cover:'Concept de couverture',
+    metaWord:'s pour générer',restart:'↺ Redémarrer la démo',coverCap:'Lora serif · fond crème · polaroïd',
+    s1:'vendeurs Etsy actifs',s2:'marché du produit numérique',s3:'langues de sortie',mPill:'MARCHÉ & MODÈLE',
+    mTitleA:'Chaque vendeur Etsy peut',mTitleB:'lancer une boutique en un jour.',
+    p1n:'Débutant',p1d:'5 produits / mois',p1p:'Gratuit',p2n:'Créateur',p2d:'Illimité + multilingue',p3n:'Studio',p3d:'En masse + équipe',
+    w1:'<b>Marché mondial :</b> Une interface, du contenu prêt à vendre en 5 langues.',
+    w2:'<b>Heures → secondes :</b> Une fiche prend normalement 1-2 heures. Avec nous, moins d\'une minute.',
+    w3:'<b>Conçu par une experte :</b> Modèles pensés avec l\'approche d\'une psychologue — pas une sortie IA générique.',
+    w4:'<b>Écosystème prêt :</b> Soutenu par une équipe de contenu de 100 personnes et des collaborations de marques.'}
+};
+
+const NICHES = {
+  tr:[['🧠','ADHD & Odaklanma','Çalışma kitapları, planlayıcılar'],['🌿','Anksiyete & Sakinlik','Self-therapy rehberleri'],['🎨','Boyama Kitabı','Mandala, doodle, mindful'],['📓','Günlük & Journal','Şükran, niyet, ruh hali']],
+  en:[['🧠','ADHD & Focus','Workbooks, planners'],['🌿','Anxiety & Calm','Self-therapy guides'],['🎨','Coloring Book','Mandala, doodle, mindful'],['📓','Journal & Diary','Gratitude, intention, mood']],
+  de:[['🧠','ADHS & Fokus','Arbeitsbücher, Planer'],['🌿','Angst & Ruhe','Selbsttherapie-Guides'],['🎨','Malbuch','Mandala, Doodle, achtsam'],['📓','Journal & Tagebuch','Dankbarkeit, Absicht, Stimmung']],
+  fr:[['🧠','TDAH & Concentration','Cahiers, agendas'],['🌿','Anxiété & Calme','Guides d\'auto-thérapie'],['🎨','Livre de coloriage','Mandala, doodle, pleine conscience'],['📓','Journal intime','Gratitude, intention, humeur']]
+};
+const OUTLANGS = [['English','🇬🇧 English'],['German','🇩🇪 Deutsch'],['French','🇫🇷 Français'],['Spanish','🇪🇸 Español'],['Turkish','🇹🇷 Türkçe']];
+
+let lang='tr', selectedNiche=null, outLang='English';
+
+function setLang(l){lang=l;document.querySelectorAll('#langbar button').forEach(b=>b.classList.toggle('on',b.dataset.l===l));renderUI();}
+
+function renderUI(){
+  const t=T[lang];
+  document.getElementById('h1').innerHTML=t.h1a+'<br><span class="accent">'+t.h1b+'</span>';
+  document.getElementById('lede').textContent=t.lede;
+  document.getElementById('lab1').textContent=t.lab1;
+  document.getElementById('lab2').textContent=t.lab2;
+  document.getElementById('goTxt').textContent=t.go;
+  document.getElementById('loadTitle').textContent=t.loadTitle;
+  const nc=document.getElementById('niches');nc.innerHTML='';
+  NICHES[lang].forEach((n,idx)=>{
+    const d=document.createElement('div');d.className='niche';
+    d.innerHTML=`<div class="emoji">${n[0]}</div><div class="txt"><b>${n[1]}</b><span>${n[2]}</span></div><div class="check">✓</div>`;
+    d.onclick=()=>pickNiche(idx,d);
+    if(selectedNiche===idx)d.classList.add('sel');
+    nc.appendChild(d);
+  });
+  const ol=document.getElementById('outlangs');ol.innerHTML='';
+  OUTLANGS.forEach(o=>{
+    const c=document.createElement('div');c.className='chip'+(outLang===o[0]?' sel':'');
+    c.textContent=o[1];c.onclick=()=>{outLang=o[0];renderUI();};ol.appendChild(c);
+  });
+}
+function pickNiche(idx,el){selectedNiche=idx;document.querySelectorAll('.niche').forEach(n=>n.classList.remove('sel'));el.classList.add('sel');document.getElementById('goBtn').disabled=false;}
+function show(id){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelector('.screen').scrollTop=0;}
+
+const loadSteps={
+  tr:['Niş analiz ediliyor…','Pazar trendleri taranıyor…','SEO başlığı yazılıyor…','Açıklama üretiliyor…','Etiketler optimize ediliyor…'],
+  en:['Analyzing niche…','Scanning market trends…','Writing SEO title…','Generating description…','Optimizing tags…'],
+  de:['Nische wird analysiert…','Markttrends…','SEO-Titel…','Beschreibung…','Tags…'],
+  fr:['Analyse de la niche…','Tendances…','Titre SEO…','Description…','Tags…']
+};
+
+async function go(){
+  show('v2');
+  const t0=Date.now();
+  const steps=loadSteps[lang];
+  const stepEl=document.getElementById('loadStep');
+  const bar=document.getElementById('barFill');
+  let i=0;bar.style.width='0';
+  const anim=setInterval(()=>{stepEl.textContent=steps[i%steps.length];bar.style.width=Math.min(90,(i+1)/steps.length*100)+'%';i++;},650);
+
+  const niche=NICHES[lang][selectedNiche][1];
+  try{
+    const r=await fetch('/api/generate',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({niche,outName:outLang})
+    });
+    if(!r.ok)throw new Error('api');
+    const result=await r.json();
+    clearInterval(anim);bar.style.width='100%';
+    const secs=((Date.now()-t0)/1000).toFixed(1);
+    setTimeout(()=>renderResult(result,niche,secs),350);
+  }catch(e){clearInterval(anim);renderError();}
+}
+
+function renderResult(r,niche,secs){
+  const t=T[lang];
+  document.getElementById('resPill').textContent=t.pill;
+  document.getElementById('resTag').textContent=t.tag;
+  document.getElementById('resTitle').textContent=r.product||niche;
+  document.getElementById('resMeta').textContent='📦 Etsy · '+secs+' '+t.metaWord;
+  document.getElementById('resNote').textContent=t.note;
+  document.getElementById('seeMarket').textContent=t.seeMarket;
+  document.getElementById('again').textContent=t.again;
+  const coverWords=(r.cover||r.product||'').split('/').map(s=>s.trim()).join('<br>');
+  const tagsHtml=(r.tags||[]).map(x=>`<span>${escapeHtml(x)}</span>`).join('');
+  document.getElementById('resBody').innerHTML=`
+    <div class="card"><div class="card-label"><span class="ic">🎯</span> ${t.title}</div><h3>${escapeHtml(r.title||'')}</h3></div>
+    <div class="card"><div class="card-label"><span class="ic">📝</span> ${t.desc}</div><p>${escapeHtml(r.description||'')}</p></div>
+    <div class="card"><div class="card-label"><span class="ic">🏷️</span> ${t.tags}</div><div class="tags">${tagsHtml}</div></div>
+    <div class="card"><div class="card-label"><span class="ic">🖼️</span> ${t.cover}</div><div class="polaroid"><div class="img"><span>${coverWords}</span></div><div class="cap">${t.coverCap}</div></div></div>`;
+  show('v3');
+}
+
+function renderError(){
+  const msg={tr:'Şu an üretim yapılamadı. Birkaç saniye sonra tekrar dene — sistem yoğun olabilir.',
+    en:'Could not generate right now. Please try again in a few seconds.'}[lang]||'Tekrar dene.';
+  document.getElementById('resPill').textContent='⚠';
+  document.getElementById('resTag').textContent='';
+  document.getElementById('resTitle').textContent='—';
+  document.getElementById('resMeta').textContent='';
+  document.getElementById('resBody').innerHTML=`<div class="err">${msg}</div>`;
+  document.getElementById('resNote').textContent='';
+  document.getElementById('seeMarket').textContent=T[lang].seeMarket;
+  document.getElementById('again').textContent=T[lang].again;
+  show('v3');
+}
+
+function escapeHtml(s){return (s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function reset(){selectedNiche=null;document.getElementById('goBtn').disabled=true;renderUI();show('v1');}
+
+function renderMarket(){
+  const t=T[lang];
+  document.getElementById('mPill').textContent=t.mPill;
+  document.getElementById('mTitle').innerHTML=t.mTitleA+'<br><span class="accent">'+t.mTitleB+'</span>';
+  document.getElementById('s1').textContent=t.s1;document.getElementById('s2').textContent=t.s2;document.getElementById('s3').textContent=t.s3;
+  document.getElementById('p1n').textContent=t.p1n;document.getElementById('p1d').textContent=t.p1d;document.getElementById('p1p').textContent=t.p1p;
+  document.getElementById('p2n').textContent=t.p2n;document.getElementById('p2d').textContent=t.p2d;
+  document.getElementById('p3n').textContent=t.p3n;document.getElementById('p3d').textContent=t.p3d;
+  document.getElementById('w1').innerHTML=t.w1;document.getElementById('w2').innerHTML=t.w2;document.getElementById('w3').innerHTML=t.w3;document.getElementById('w4').innerHTML=t.w4;
+  document.getElementById('restart').textContent=t.restart;
+}
+
+renderUI();
+</script>
+</body>
+</html>
