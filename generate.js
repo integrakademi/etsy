@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: "API anahtarı sunucuda tanımlı değil." });
+    return res.status(500).json({ error: "API anahtarı sunucuda tanımlı değil (GEMINI_API_KEY)." });
   }
 
   try {
@@ -28,39 +28,48 @@ Respond ONLY with a valid JSON object, no markdown, no backticks, with EXACTLY t
  "cover": 2-3 very short words for a cover image, separated by " / "
 }`;
 
-    const url =
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" +
-      apiKey;
+    // Birden fazla model dene — biri yanıt vermezse diğerine geç (model kaynaklı hatayı önler)
+    const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-flash-latest"];
+    let lastErr = null;
 
-    const r = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.8, responseMimeType: "application/json" },
-      }),
-    });
+    for (const model of models) {
+      const url =
+        "https://generativelanguage.googleapis.com/v1beta/models/" +
+        model + ":generateContent?key=" + apiKey;
 
-    const data = await r.json();
+      const r = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.8, responseMimeType: "application/json" },
+        }),
+      });
 
-    if (!r.ok) {
-      return res.status(502).json({ error: "Gemini hatası", detail: data });
+      const data = await r.json();
+
+      if (!r.ok) {
+        // Hatayı sakla, sonraki modeli dene
+        lastErr = data?.error?.message || JSON.stringify(data);
+        continue;
+      }
+
+      let txt =
+        data?.candidates?.[0]?.content?.parts?.map((p) => p.text).join("") || "";
+      txt = txt.replace(/```json|```/g, "").trim();
+
+      try {
+        const parsed = JSON.parse(txt);
+        res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate");
+        return res.status(200).json(parsed);
+      } catch {
+        lastErr = "Yanıt JSON olarak çözümlenemedi.";
+        continue;
+      }
     }
 
-    let txt =
-      data?.candidates?.[0]?.content?.parts?.map((p) => p.text).join("") || "";
-    txt = txt.replace(/```json|```/g, "").trim();
-
-    let parsed;
-    try {
-      parsed = JSON.parse(txt);
-    } catch {
-      return res.status(502).json({ error: "Yanıt çözümlenemedi", raw: txt });
-    }
-
-    // 1 saat cache (aynı niş+dil tekrar gelirse Gemini'yi yormaz, kotanı korur)
-    res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate");
-    return res.status(200).json(parsed);
+    // Hiçbir model çalışmadıysa gerçek sebebi döndür
+    return res.status(502).json({ error: "Üretim başarısız", detail: lastErr });
   } catch (e) {
     return res.status(500).json({ error: "Sunucu hatası", detail: String(e) });
   }
